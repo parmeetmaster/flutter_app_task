@@ -31,17 +31,7 @@ class MultiLineTextInput extends StatelessWidget {
               icon,
             ),*/
             prefixText: ' ',
-            suffixIcon:InkWell(
-              onTap: (){
-                controller.text="";
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CircleAvatar(
-                    backgroundColor: Colors.grey[200],
-                    child: Icon(Icons.clear)),
-              ),
-            ),
+
             suffixStyle: const TextStyle(color: Colors.red)),
       ),
     );

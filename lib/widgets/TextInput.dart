@@ -22,7 +22,7 @@ class SingleLineTextInput extends StatelessWidget {
 
         keyboardType: TextInputType.multiline,
         decoration: new InputDecoration(
-            contentPadding: EdgeInsets.all(20.0),
+            contentPadding: EdgeInsets.only(top:20.0,bottom:20.0,left: 10,right: 10),
             border: new OutlineInputBorder(
                 borderSide: new BorderSide(color: Colors.teal)),
             hintText: m_hintText,
@@ -30,7 +30,7 @@ class SingleLineTextInput extends StatelessWidget {
             labelText: m_labelText,
 
             prefixText: ' ',
-            suffixIcon:InkWell(
+          /*  suffixIcon:InkWell(
               onTap: (){
                 controller.text="";
               },
@@ -40,7 +40,7 @@ class SingleLineTextInput extends StatelessWidget {
                     backgroundColor: Colors.grey[200],
                     child: Icon(Icons.clear)),
               ),
-            ),
+            ),*/
             suffixStyle: const TextStyle(color: Colors.red)),
       ),
     );
