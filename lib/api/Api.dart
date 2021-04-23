@@ -25,16 +25,24 @@ class Api {
     );
   }
 
-  Future<Response> uploadData(String name, String description, String expiry, List<File> images) async {
-    
+  Future<Response> uploadData(String category,String name, String description, String expiry, List<File> images,List<MultipartFile> multiImages) async {
+    Map<String, dynamic> map= {"category_id": int.parse(category),
+    "name": name,
+    "desc": description,
+    "expiry": expiry,
+    };
 
-    FormData formData = FormData.fromMap({"category_id": 1,
-      "name": "anxjbxhachjvacgvaghcvagvcavcagc",
-      "desc": "xaxasxaxaxasxasbhxvashjxagsxghasxghacxcasgcxghascxghascxghascgxcasx",
-      "expiry": "2021:04:22 4:25:03",
-      "product_image[0]":await MultipartFile.fromFile(images[0].path,
-        filename: basename(images[0].path),)
-    });
+    for(int i=0;i<images.length;i++){
+      map.putIfAbsent("product_image[${i}]", () => multiImages[i]);
+    }
+
+
+  /*  await MultipartFile.fromFile(images[0].path,
+        filename: basename(images[0].path));*/
+
+
+
+    FormData formData = FormData.fromMap(map);
 
 
     return await dio.post(

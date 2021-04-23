@@ -27,6 +27,7 @@ class _UploadScreenState extends State<UploadScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: Provider.of<UploadScreenProvider>(context).key,
       body: Consumer<UploadScreenProvider>(
         builder: (context, value,child) {
          if(value.currunt_state==appstate.loading_complete)
@@ -52,7 +53,7 @@ class _UploadScreenState extends State<UploadScreen> {
                         Container(
                             height: 50,
                             child: DropDownWidget(listitems: value.listItemsForSelection,onItemSelected: (item){
-                              AppLogger.print(item);
+                             value.selectedCategoryItem(item);
 
                             },)),
                       ],
@@ -240,7 +241,13 @@ class _UploadScreenState extends State<UploadScreen> {
 
   @override
   void initState() {
+
+
     final provider =Provider.of<UploadScreenProvider>(context,listen: false);
+   provider.key=GlobalKey<ScaffoldState>();
+   provider.reset();
     provider.init();
+
+
   }
 }

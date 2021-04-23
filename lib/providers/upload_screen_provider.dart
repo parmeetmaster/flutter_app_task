@@ -9,9 +9,11 @@ import 'package:flutter_app_task/model/product_categories.dart';
 import 'package:flutter_app_task/utils/app_logger.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:path/path.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class UploadScreenProvider extends ChangeNotifier {
-  List<Category> ls;
+  List<Category> categories;
   dynamic currunt_state = appstate.defaultstate;
 
   List<String> listItemsForSelection;
@@ -21,6 +23,26 @@ class UploadScreenProvider extends ChangeNotifier {
   TextEditingController descriptionController = new TextEditingController();
   List<File> images = [];
   File image;
+  int catagoryNumber;
+  Category activeCategory;
+  GlobalKey<ScaffoldState> key;
+  DateTime expireDate;
+
+  reset() {
+    categories = null;
+    currunt_state = appstate.defaultstate;
+
+    listItemsForSelection = null;
+
+    expiryController = new TextEditingController();
+    nameController = new TextEditingController();
+    descriptionController = new TextEditingController();
+    images = [];
+    image = null;
+    catagoryNumber = null;
+    activeCategory = null;
+    expireDate = null;
+  }
 
   init() async {
     listItemsForSelection = [];
@@ -29,7 +51,7 @@ class UploadScreenProvider extends ChangeNotifier {
         ProductCategories.fromJson(jsonDecode(response.data));
 
     List<Category> ls = model.categories;
-    this.ls = ls;
+    this.categories = ls;
     for (Category category in ls) {
       listItemsForSelection.add(category.name);
     }
@@ -39,6 +61,7 @@ class UploadScreenProvider extends ChangeNotifier {
   }
 
   void setDate(DateTime picked) {
+    expireDate = picked;
     String expiryString = DateFormat("dd-MM-yyyy").format(picked).toString();
     expiryController.text = expiryString;
   }
@@ -64,11 +87,60 @@ class UploadScreenProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-
-
-  onsubmit() async{
- Response response=  await Api().uploadData(nameController.text,descriptionController.text,expiryController.text,images);
-
+  showMessage(String message) {
+    key.currentState.showSnackBar(SnackBar(content: Text(message)));
   }
 
+  onsubmit() async {
+    if (activeCategory == null) {
+      showMessage("Please select least one Category");
+      return;
+    }
+
+    if (nameController.text.isEmpty) {
+      showMessage("Please provider name");
+      return;
+    }
+    if (descriptionController.text.isEmpty) {
+      showMessage("Please provider description");
+      return;
+    }
+    if (expiryController.text.isEmpty) {
+      showMessage("Please provider Expire date");
+      return;
+    }
+
+    if (images.length < 1) {
+      showMessage("Please add few images");
+      return;
+    }
+
+    List<MultipartFile> multipartImages = [];
+    for (int i = 0; i < images.length; i++) {
+      MultipartFile file = await MultipartFile.fromFile(images[0].path,
+          filename: basename(images[i].path));
+      multipartImages.add(file);
+    }
+
+    Response response = await Api().uploadData(
+        activeCategory.id,
+        nameController.text,
+        descriptionController.text,
+        expireDate.toString(),
+        images,
+        multipartImages);
+
+    if (response.statusCode == 200) {
+      showMessage("Data upload Successfully");
+    }
+  }
+
+  void selectedCategoryItem(String str) {
+    for (Category item in categories) {
+      if (item.name.contains(str)) {
+        activeCategory = item;
+        break;
+      }
+    }
+  }
 }
